@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altın Takip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
+
+        header {
+            background: #fff; padding: 16px 28px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        header h1 { font-size: 1.5rem; font-weight: 700; color: #b8860b; letter-spacing: -0.02em; }
+        #refresh-info { margin-left: auto; font-size: 0.85rem; color: #999; }
+        #refresh-btn {
+            background: #fff; border: 1.5px solid #d4a800; color: #b8860b;
+            padding: 7px 18px; border-radius: 8px; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; font-family: inherit;
+            transition: background 0.15s, color 0.15s;
+        }
+        #refresh-btn:hover { background: #b8860b; color: #fff; }
+
+        #markets { display: flex; flex-wrap: wrap; gap: 14px; padding: 24px 28px; }
+
+        .card {
+            background: #fff; border: 1px solid #e8e8e8;
+            border-radius: 14px; padding: 18px 22px; min-width: 160px; flex: 1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card-label {
+            font-size: 0.75rem; color: #aaa; text-transform: uppercase;
+            letter-spacing: 0.08em; margin-bottom: 8px; font-weight: 600;
+        }
+        .card-price { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; color: #1a1a1a; }
+        .card-change { font-size: 0.85rem; margin-top: 5px; font-weight: 500; }
+        .up { color: #16a34a; } .down { color: #dc2626; }
+        .card-sub { margin-top: 10px; font-size: 0.8rem; color: #bbb; }
+        .card-sub span { color: #555; font-weight: 600; }
+
+        /* Altın kartı biraz öne çıksın */
+        .card-gold { border-color: #e8d48a; background: #fffdf0; }
+        .card-gold .card-price { color: #b8860b; }
+
+        #news-section { padding: 0 28px 36px; }
+        #news-section h2 {
+            font-size: 0.8rem; color: #aaa; text-transform: uppercase;
+            letter-spacing: 0.1em; margin-bottom: 16px; font-weight: 600;
+        }
+        #news-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .news-card {
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 12px;
+            padding: 16px 18px; text-decoration: none; display: block;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .news-card:hover { border-color: #d4a800; box-shadow: 0 4px 12px rgba(184,134,11,0.1); }
+        .news-title { font-size: 0.95rem; color: #1a1a1a; line-height: 1.5; margin-bottom: 8px; font-weight: 500; }
+        .news-meta { font-size: 0.75rem; color: #bbb; }
+        .news-source { color: #b8860b; font-weight: 600; }
+        .msg { color: #bbb; font-style: italic; padding: 12px 0; font-size: 0.95rem; }
+        .err { color: #dc2626; padding: 12px 0; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <span style="font-size:1.6rem">&#x1F947;</span>
+    <h1>Altın Takip</h1>
+    <span id="refresh-info">Yükleniyor...</span>
+    <button id="refresh-btn" onclick="doRefresh()">Yenile</button>
+</header>
+
+<div id="markets">
+    <div class="card card-gold">
+        <div class="card-label">Ons Altın (USD)</div>
+        <div class="card-price" id="gold-price">—</div>
+        <div class="card-change" id="gold-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="gold-yesterday">—</span></div>
+    </div>
+    <div class="card card-gold">
+        <div class="card-label">Gram Altın (TL)</div>
+        <div class="card-price" id="gram-price">—</div>
+        <div class="card-change" id="gram-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="gram-yesterday">—</span></div>
+    </div>
+    <div class="card">
+        <div class="card-label">Gümüş (USD)</div>
+        <div class="card-price" id="silver-price">—</div>
+        <div class="card-change" id="silver-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="silver-yesterday">—</span></div>
+    </div>
+    <div class="card">
+        <div class="card-label">Dolar (USD/TRY)</div>
+        <div class="card-price" id="usd-price">—</div>
+        <div class="card-change" id="usd-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="usd-yesterday">—</span></div>
+    </div>
+    <div class="card">
+        <div class="card-label">Euro (EUR/TRY)</div>
+        <div class="card-price" id="eur-price">—</div>
+        <div class="card-change" id="eur-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="eur-yesterday">—</span></div>
+    </div>
+    <div class="card">
+        <div class="card-label">Brent Petrol (USD)</div>
+        <div class="card-price" id="brent-price">—</div>
+        <div class="card-change" id="brent-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="brent-yesterday">—</span></div>
+    </div>
+    <div class="card">
+        <div class="card-label">Bitcoin (USD)</div>
+        <div class="card-price" id="btc-price">—</div>
+        <div class="card-change" id="btc-change"></div>
+        <div class="card-sub">Dünkü Ortalama: <span id="btc-yesterday">—</span></div>
+    </div>
+</div>
+
+<div id="news-section">
+    <h2>Son Haberler</h2>
+    <div id="news-list"><span class="msg">Haberler yükleniyor...</span></div>
+</div>
+
+<script>
+    const INTERVAL = 5 * 60 * 1000;
+
+    function num(val, decimals) {
+        return val != null ? Number(val).toLocaleString('tr-TR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : '—';
+    }
+
+    function setCard(priceId, changeId, yesterdayId, data, prefix='', decimals=2) {
+        const priceEl = document.getElementById(priceId);
+        const changeEl = document.getElementById(changeId);
+        const yEl = document.getElementById(yesterdayId);
+        if (!data || data.price == null) { priceEl.textContent = '—'; return; }
+        priceEl.textContent = prefix + num(data.price, decimals);
+        if (data.change != null) {
+            const sign = data.change >= 0 ? '+' : '';
+            changeEl.textContent = `${sign}${data.change_pct}%`;
+            changeEl.className = 'card-change ' + (data.change >= 0 ? 'up' : 'down');
+        }
+        if (yEl) yEl.textContent = data.yesterday_avg != null ? prefix + num(data.yesterday_avg, decimals) : '—';
+    }
+
+    async function fetchMarkets() {
+        try {
+            const d = await fetch('/api/price').then(r => r.json());
+            if (d.error) throw new Error(d.error);
+
+            setCard('gold-price',   'gold-change',   'gold-yesterday',   d.gold,    '$', 2);
+            setCard('gram-price',   'gram-change',   'gram-yesterday',   d.gram_tl, '₺', 2);
+            setCard('silver-price', 'silver-change', 'silver-yesterday', d.silver,  '$', 2);
+            setCard('usd-price',    'usd-change',    'usd-yesterday',    d.usd_try, '₺', 4);
+            setCard('eur-price',    'eur-change',    'eur-yesterday',    d.eur_try, '₺', 4);
+            setCard('brent-price',  'brent-change',  'brent-yesterday',  d.brent,   '$', 2);
+            setCard('btc-price',    'btc-change',    'btc-yesterday',    d.bitcoin, '$', 0);
+        } catch (e) {
+            document.getElementById('gold-price').textContent = 'Hata';
+        }
+    }
+
+    async function fetchNews() {
+        const container = document.getElementById('news-list');
+        try {
+            const items = await fetch('/api/news').then(r => r.json());
+            if (!items.length) { container.innerHTML = '<span class="msg">Son 24 saatte haber bulunamadı.</span>'; return; }
+            container.innerHTML = items.map(item => {
+                const date = item.pubDate ? new Date(item.pubDate).toLocaleString('tr-TR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
+                const safeTitle = item.title.replace(/</g, '&lt;');
+                return `<a class="news-card" href="${item.link}" target="_blank" rel="noopener">
+                    <div class="news-title">${safeTitle}</div>
+                    <div class="news-meta">${item.source ? `<span class="news-source">${item.source}</span> &middot; ` : ''}${date}</div>
+                </a>`;
+            }).join('');
+        } catch (e) {
+            container.innerHTML = '<span class="err">Haberler alınamadı: ' + e.message + '</span>';
+        }
+    }
+
+    async function doRefresh() {
+        document.getElementById('refresh-btn').disabled = true;
+        await Promise.all([fetchMarkets(), fetchNews()]);
+        const now = new Date().toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        document.getElementById('refresh-info').textContent = 'Her 5 dk güncellenir · Son: ' + now;
+        document.getElementById('refresh-btn').disabled = false;
+    }
+
+    doRefresh();
+    setInterval(doRefresh, INTERVAL);
+</script>
+
+</body>
+</html>
