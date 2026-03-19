@@ -3,18 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Altın Takip</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Altınolog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
 
         header {
-            background: #fff; padding: 16px 28px;
+            background: #fff; padding: 14px 28px;
             border-bottom: 1px solid #e8e8e8;
-            display: flex; align-items: center; gap: 12px;
+            display: flex; align-items: center; gap: 14px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
+        .logo {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+        }
+        .logo-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, #f5c842, #b8860b);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(184,134,11,0.3);
+        }
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.55rem; font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .logo-text span:first-child { color: #b8860b; }
+        .logo-text span:last-child  { color: #1a1a1a; }
         header h1 { font-size: 1.5rem; font-weight: 700; color: #b8860b; letter-spacing: -0.02em; }
         #refresh-info { margin-left: auto; font-size: 0.85rem; color: #999; }
         #refresh-btn {
@@ -69,8 +87,10 @@
 <body>
 
 <header>
-    <span style="font-size:1.6rem">&#x1F947;</span>
-    <h1>Altın Takip</h1>
+    <div class="logo">
+        <div class="logo-icon">&#x1F947;</div>
+        <div class="logo-text"><span>Altın</span><span>olog</span></div>
+    </div>
     <span id="refresh-info">Yükleniyor...</span>
     <button id="refresh-btn" onclick="doRefresh()">Yenile</button>
 </header>
